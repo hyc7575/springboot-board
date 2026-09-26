@@ -4,6 +4,7 @@ import com.springbootboard.board.post.dto.PostCreateRequestDto;
 import com.springbootboard.board.post.dto.PostDto;
 import com.springbootboard.board.post.service.PostService;
 import lombok.RequiredArgsConstructor;
+import com.springbootboard.global.ApiResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,18 +16,18 @@ import java.util.List;
 public class PostApiController {
 	private final PostService postService;
 	@GetMapping
-	public List<PostDto> list() {
-		return postService.getPosts();
+	public ApiResponse<List<PostDto>> list() {
+		return ApiResponse.success(postService.getPosts());
 	}
 
 	@GetMapping("/{id}")
-	public PostDto detail(@PathVariable Integer id) {
-		return postService.getPost(id);
+	public ApiResponse<PostDto> detail(@PathVariable Integer id) {
+		return ApiResponse.success(postService.getPost(id));
 	}
 
 	@PostMapping
-	public PostDto create(@RequestBody PostCreateRequestDto dto, Authentication authentication) {
+	public ApiResponse<PostDto> create(@RequestBody PostCreateRequestDto dto, Authentication authentication) {
 		System.out.println("--- post create api ---");
-		return postService.createPost(dto, authentication);
+		return ApiResponse.success(postService.createPost(dto, authentication));
 	}
 }

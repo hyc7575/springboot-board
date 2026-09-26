@@ -5,6 +5,7 @@ import com.springbootboard.board.comment.dto.CommentDto;
 import com.springbootboard.board.comment.dto.CommentUpdateRequestDto;
 import com.springbootboard.board.comment.service.CommentService;
 import lombok.RequiredArgsConstructor;
+import com.springbootboard.global.ApiResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,34 +18,35 @@ public class CommentController {
 	private final CommentService commentService;
 
 	@GetMapping
-	public List<CommentDto> getComments(
+	public ApiResponse<List<CommentDto>> getComments(
 			@PathVariable Long postId
 	) {
-		return commentService.getComments(postId);
+		return ApiResponse.success(commentService.getComments(postId));
 	}
 
 	@PostMapping
-	public CommentDto createComment(
+	public ApiResponse<CommentDto> createComment(
 			@PathVariable Long postId,
 			@RequestBody CommentCreateRequestDto request
 	) {
-		return commentService.createComment(postId, request);
+		return ApiResponse.success(commentService.createComment(postId, request));
 	}
 
 	@PatchMapping("/{commentId}")
-	public CommentDto updateComment(
+	public ApiResponse<CommentDto> updateComment(
 			@PathVariable Long postId,
 			@PathVariable Long commentId,
 			@RequestBody CommentUpdateRequestDto request
 	) {
-		return commentService.updateComment(postId, commentId, request);
+		return ApiResponse.success(commentService.updateComment(postId, commentId, request));
 	}
 
 	@DeleteMapping("/{commentId}")
-	public void deleteComment(
+	public ApiResponse<Void> deleteComment(
 			@PathVariable Long postId,
 			@PathVariable Long commentId
 	) {
 		commentService.deleteComment(postId, commentId);
+		return ApiResponse.success(null);
 	}
 }

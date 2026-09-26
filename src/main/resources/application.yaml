@@ -3,3 +3,5 @@ spring:
     name: springboot-board
   profiles:
     default: local
+  jwt:
+    secret: "6595e9faec7d0e86f3d0f23b3f1ec048829309f49bceaee04a2edd46b1cb08d7"
