@@ -24,7 +24,7 @@ public class CommentService {
 	private final MemberRepository memberRepository;
 	@Transactional(readOnly = true)
 	public List<CommentDto> getComments(Integer postId) {
-		return commentRepository.findByPostId(postId).stream()
+		return commentRepository.findByPost_IdAndDeletedAtIsNullAndPost_DeletedAtIsNull(postId).stream()
 				.map(CommentDto::from)
 				.toList();
 	}
@@ -46,10 +46,26 @@ public class CommentService {
 		return CommentDto.from(commentRepository.save(comment));
 	}
 
-	public CommentDto updateComment(Integer postId, Long commentId, CommentUpdateRequestDto request) {
-		return null;
-	}
+	@Transactional
+    public CommentDto updateComment(Integer postId, Integer commentId, Integer memberId, CommentUpdateRequestDto request) {
+        Comment comment = findOwnedComment(postId, commentId, memberId);
+        comment.modify(request.content());
+        return CommentDto.from(comment);
+    }
 
-	public void deleteComment(Integer postId, Long commentId) {
-	}
+    @Transactional
+    public void deleteComment(Integer postId, Integer commentId, Integer memberId) {
+        Comment comment = findOwnedComment(postId, commentId, memberId);
+        comment.delete();
+    }
+
+    private Comment findOwnedComment(Integer postId, Integer commentId, Integer memberId) {
+        Comment comment = commentRepository.findByIdAndPost_IdAndDeletedAtIsNull(commentId, postId)
+                .filter(found -> found.getPost().getDeletedAt() == null)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."));
+        if (!comment.getMemberId().equals(memberId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "작성자만 수정하거나 삭제할 수 있습니다.");
+        }
+        return comment;
+    }
 }

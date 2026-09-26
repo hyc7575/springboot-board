@@ -44,6 +44,10 @@ public class Comment {
 		this.content = content;
 	}
 
+	public void modify(String content) {
+		this.content = content;
+	}
+
 	public void delete() {
 		this.deletedAt = LocalDateTime.now();
 	}

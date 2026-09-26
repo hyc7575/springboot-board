@@ -13,6 +13,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.springbootboard.board.post.dto.PostUpdateRequestDto;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -50,5 +52,26 @@ public class PostService {
 		postRepository.save(post);
 		return post.toDto();
 	}
-}
 
+    @Transactional
+    public PostDto updatePost(Integer postId, Integer memberId, PostUpdateRequestDto request) {
+        Post post = findOwnedPost(postId, memberId);
+        post.modify(request.title(), request.content());
+        return post.toDto();
+    }
+
+    @Transactional
+    public void deletePost(Integer postId, Integer memberId) {
+        Post post = findOwnedPost(postId, memberId);
+        post.delete();
+    }
+
+    private Post findOwnedPost(Integer postId, Integer memberId) {
+        Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다."));
+        if (!post.getMemberId().equals(memberId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "작성자만 수정하거나 삭제할 수 있습니다.");
+        }
+        return post;
+    }
+}

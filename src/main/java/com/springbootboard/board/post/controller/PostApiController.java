@@ -5,7 +5,8 @@ import com.springbootboard.board.post.dto.PostDto;
 import com.springbootboard.board.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import com.springbootboard.global.ApiResponse;
-import org.springframework.security.core.Authentication;
+import jakarta.validation.Valid;
+import com.springbootboard.board.post.dto.PostUpdateRequestDto;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -36,4 +37,17 @@ public class PostApiController {
 		System.out.println("--- post create api ---");
 		return ApiResponse.success(postService.createPost(dto, jwt));
 	}
+
+    @PatchMapping("/{id}")
+    public ApiResponse<PostDto> update(@PathVariable Integer id,
+                                      @Valid @RequestBody PostUpdateRequestDto request,
+                                      @AuthenticationPrincipal Jwt jwt) {
+        return ApiResponse.success(postService.updatePost(id, Integer.valueOf(jwt.getSubject()), request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> delete(@PathVariable Integer id, @AuthenticationPrincipal Jwt jwt) {
+        postService.deletePost(id, Integer.valueOf(jwt.getSubject()));
+        return ApiResponse.success(null);
+    }
 }

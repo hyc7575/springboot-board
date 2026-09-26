@@ -50,18 +50,20 @@ public class CommentApiController {
 	@PatchMapping("/{commentId}")
 	public ApiResponse<CommentDto> updateComment(
 			@PathVariable Integer postId,
-			@PathVariable Long commentId,
-			@RequestBody CommentUpdateRequestDto request
+			@PathVariable Integer commentId,
+			@Valid @RequestBody CommentUpdateRequestDto request,
+			@AuthenticationPrincipal Jwt jwt
 	) {
-		return ApiResponse.success(commentService.updateComment(postId, commentId, request));
+		return ApiResponse.success(commentService.updateComment(postId, commentId, Integer.valueOf(jwt.getSubject()), request));
 	}
 
 	@DeleteMapping("/{commentId}")
 	public ApiResponse<Void> deleteComment(
 			@PathVariable Integer postId,
-			@PathVariable Long commentId
+			@PathVariable Integer commentId,
+			@AuthenticationPrincipal Jwt jwt
 	) {
-		commentService.deleteComment(postId, commentId);
+		commentService.deleteComment(postId, commentId, Integer.valueOf(jwt.getSubject()));
 		return ApiResponse.success(null);
 	}
 }
