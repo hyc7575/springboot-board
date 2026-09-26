@@ -25,7 +25,6 @@ public class PostApiController {
 
 	@GetMapping("/{id}")
 	public ApiResponse<PostDto> detail(@PathVariable Integer id) {
-		System.out.println("--- api detail --- %d".formatted(id));
 		return ApiResponse.success(postService.getPost(id));
 	}
 
@@ -34,7 +33,6 @@ public class PostApiController {
 			@RequestBody PostCreateRequestDto dto,
 			@AuthenticationPrincipal Jwt jwt
 	) {
-		System.out.println("--- post create api ---");
 		return ApiResponse.success(postService.createPost(dto, jwt));
 	}
 

@@ -43,7 +43,6 @@ public class PostService {
 			@AuthenticationPrincipal Jwt jwt
 	) {
 		Integer memberId = Integer.valueOf(jwt.getSubject());
-		System.out.println("---- create post ---- %d".formatted(memberId));
 		Member member = memberRepository.findById(memberId)
 				.orElseThrow(() -> new ResponseStatusException(
 						HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."
