@@ -33,8 +33,8 @@ public class PostWebController {
     }
 
     @PostMapping
-    public String create(@ModelAttribute PostCreateRequestDto dto, Authentication authentication) {
-        PostDto post = postService.createPost(dto, authentication);
-        return "redirect:/posts/" + post.getId();
+    public void create(@ModelAttribute PostCreateRequestDto dto, Authentication authentication) {
+//        PostDto post = postService.createPost(dto, authentication);
+//        return "redirect:/posts/" + post.getId();
     }
 }

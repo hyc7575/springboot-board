@@ -6,6 +6,8 @@ import com.springbootboard.board.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import com.springbootboard.global.ApiResponse;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,12 +24,16 @@ public class PostApiController {
 
 	@GetMapping("/{id}")
 	public ApiResponse<PostDto> detail(@PathVariable Integer id) {
+		System.out.println("--- api detail --- %d".formatted(id));
 		return ApiResponse.success(postService.getPost(id));
 	}
 
 	@PostMapping
-	public ApiResponse<PostDto> create(@RequestBody PostCreateRequestDto dto, Authentication authentication) {
+	public ApiResponse<PostDto> create(
+			@RequestBody PostCreateRequestDto dto,
+			@AuthenticationPrincipal Jwt jwt
+	) {
 		System.out.println("--- post create api ---");
-		return ApiResponse.success(postService.createPost(dto, authentication));
+		return ApiResponse.success(postService.createPost(dto, jwt));
 	}
 }

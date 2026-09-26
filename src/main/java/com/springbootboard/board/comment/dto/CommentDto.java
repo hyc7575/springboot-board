@@ -4,7 +4,7 @@ import com.springbootboard.board.comment.domain.Comment;
 
 public record CommentDto(
 		Long id,
-		Long authorId,
+		Long memberId,
 		String content,
 		Long parentId
 ) {

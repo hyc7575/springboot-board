@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -22,13 +24,11 @@ public class PostService {
 	private final MemberRepository memberRepository;
 	private final PostRepository postRepository;
 	public List<PostDto> getPosts() {
-		List<Post> posts = postRepository.findAllByDeletedAtIsNotNull();
-		System.out.println("--- post ---");
-		log.debug(posts.toString());
+		List<Post> posts = postRepository.findAllByDeletedAtIsNull();
 		return posts.stream().map(Post::toDto).toList();
 	}
 	public PostDto getPost(int postId) {
-		Post post = (Post) postRepository.findByIdAndDeletedAtIsNull(postId)
+		Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
 				.orElseThrow(() -> new ResponseStatusException(
 						HttpStatus.NOT_FOUND,
 						"게시글을 찾을 수 없습니다."
@@ -36,9 +36,13 @@ public class PostService {
 
 		return post.toDto();
 	}
-	public PostDto createPost(PostCreateRequestDto dto, Authentication authentication) {
-		log.debug("email : {}", authentication.getName());
-		Member member = memberRepository.findByEmail(authentication.getName())
+	public PostDto createPost(
+			PostCreateRequestDto dto,
+			@AuthenticationPrincipal Jwt jwt
+	) {
+		Integer memberId = Integer.valueOf(jwt.getSubject());
+		System.out.println("---- create post ---- %d".formatted(memberId));
+		Member member = memberRepository.findById(memberId)
 				.orElseThrow(() -> new ResponseStatusException(
 						HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다."
 				));

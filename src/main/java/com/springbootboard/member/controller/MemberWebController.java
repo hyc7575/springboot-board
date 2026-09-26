@@ -1,7 +1,7 @@
 package com.springbootboard.member.controller;
 
 import com.springbootboard.member.dto.JoinDto;
-import com.springbootboard.member.service.AuthService;
+import com.springbootboard.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Controller
 @RequiredArgsConstructor
 public class MemberWebController {
-	private final AuthService authService;
+	private final MemberService memberService;
 	@GetMapping("/login")
 	public String loignPage() {
 		return "login";
@@ -24,7 +24,7 @@ public class MemberWebController {
 
 	@PostMapping("/join")
 	public String join(@RequestBody JoinDto jDto) {
-		authService.join(jDto);
+		memberService.join(jDto);
 
 		return "redirect:/posts";
 	}

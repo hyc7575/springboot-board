@@ -4,13 +4,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 
 @Configuration
 @EnableWebSecurity
@@ -35,12 +38,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(
+                    SessionCreationPolicy.STATELESS
+                )
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/",
                     "/login",
                     "/members/join",
                     "/swagger-ui/**",
+
+                    // for swagger
                     "/v3/api-docs",
                     "/v3/api-docs/**"
                 ).permitAll()
@@ -49,21 +60,17 @@ public class SecurityConfig {
                     "/posts/create",
                     "/posts/*/edit"
                 ).authenticated()
-
-                .requestMatchers(GET, "/posts", "/posts/**", "/api/v1/posts", "/api/v1/posts/*").permitAll()
+                // post
+                .requestMatchers(POST, "/api/v1/members/login", "/api/v1/members/join").permitAll()
+                .requestMatchers(GET, "/api/v1/posts", "/api/v1/posts/*").permitAll()
+                // comment
+                .requestMatchers(GET, "/api/v1/posts/*/comments").permitAll()
                 .anyRequest().authenticated()
             )
-            .formLogin(form -> form
-                .loginPage("/login")
-                .usernameParameter("email")
-                .defaultSuccessUrl("/posts", true)
-                .permitAll()
-            )
-            .logout(logout -> logout
-                .logoutSuccessUrl("/posts")
+            .oauth2ResourceServer(oauth2 ->
+                oauth2.jwt(Customizer.withDefaults())
             );
 
-        http.csrf(csrf -> csrf.disable());
         return http.build();
     }
 }

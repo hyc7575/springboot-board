@@ -1,8 +1,10 @@
 package com.springbootboard.board.comment.dto;
 
 
+import jakarta.validation.constraints.NotBlank;
+
 public record CommentCreateRequestDto(
-		String content, Integer parentId
+		@NotBlank String content, Integer parentId
 ) {
 
 }
