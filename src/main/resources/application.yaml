@@ -1,3 +1,5 @@
 spring:
   application:
     name: springboot-board
+  profiles:
+    default: local
